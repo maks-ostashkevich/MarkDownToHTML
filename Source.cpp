@@ -151,7 +151,6 @@ public:
 
 					if (std::get<0>(boldOpened(mods)) < std::get<0>(italicOpened(mods)))
 					{
-						// выгр пока не найдём (последний) открытый болд и его надо разбить и открыть для италика, а италик закрыть
 						std::queue<std::tuple<int, std::string, std::string, bool>> tempMods;
 						while (!(std::get<1>(mods.front()) == "**" && std::get<3>(mods.front()) == true) && mods.empty() == false)
 						{
@@ -189,7 +188,6 @@ public:
 					}
 					else
 					{
-						// выгр пока не найдём (последний) открытый болд и его надо разбить и замкнуть италик
 						std::queue<std::tuple<int, std::string, std::string, bool>> tempMods;
 						while (!(std::get<1>(mods.front()) == "**" && std::get<3>(mods.front()) == true) && mods.empty() == false)
 						{
@@ -234,20 +232,14 @@ public:
 			}
 			else
 			{
-				// p. a. !
 				if (std::get<1>(lastOpened(mods)) == "*")
-					// case for italic
 				{
-					// close last opened
-					// add {starPos, "*", false}
-					// if all closed, then form the part of string
-
 					if (starPos < line.length() - 2 && line[starPos + 1] == '*' && line[starPos + 2] != '*' ||
 						starPos == line.length() - 2 && line[starPos + 1] == '*')
 					{
 						if (std::get<1>(boldOpened(mods)) != "NO_ITEM")
 						{
-							removeLastOpened(mods); // 
+							removeLastOpened(mods);
 							closeLastOpenedBold(mods);
 							mods.push({ starPos, "**", "closing", false });
 							curr = starPos + 2;
@@ -266,21 +258,18 @@ public:
 					}
 				}
 				else
-					// case for bold
 				{
-					// если есть * после текущей *, тогда отцепляем её,
-					// иначе, расцепляем последний открытый с возвращением правой звезды из двух в текст
 					if (starPos < line.length() - 1 && line[starPos + 1] == '*')
 					{
 						closeLastOpened(mods);
 						mods.push({ starPos, "**", "closing", false });
-						curr = starPos + 2; // -> length
+						curr = starPos + 2;
 					}
 					else
 					{
 						if (std::get<1>(italicOpened(mods)) != "NO_ITEM")
 						{
-							removeLastOpened(mods); // 
+							removeLastOpened(mods);
 							closeLastOpenedItalic(mods);
 							mods.push({ starPos, "*", "closing", false });
 							curr = starPos + 1;
@@ -362,7 +351,7 @@ private:
 	{
 		const auto strBegin = str.find_first_not_of(whitespace);
 		if (strBegin == std::string::npos)
-			return ""; // no content
+			return "";
 
 		const auto strEnd = str.find_last_not_of(whitespace);
 		const auto strRange = strEnd - strBegin + 1;
@@ -370,53 +359,47 @@ private:
 		return str.substr(strBegin, strRange);
 	}
 
-	std::tuple<int, std::string, std::string, bool> lastOpened(std::queue<std::tuple<int, std::string, std::string, bool>> mods) // std::string
+	std::tuple<int, std::string, std::string, bool> lastOpened(std::queue<std::tuple<int, std::string, std::string, bool>> mods)
 	{
 		std::tuple<int, std::string, std::string, bool> lOpened = { -1, "NO_ITEM", "UNKNOWN", false };
-		// std::queue<std::tuple<int, std::string, bool>> saveMods;
 		while (mods.empty() == false)
 		{
 			if (std::get<3>(mods.front()) == true)
 			{
-				lOpened = mods.front(); // std::get<1>(mods.front());
+				lOpened = mods.front();
 			}
-			// saveMods.push(mods.pop());
 			mods.pop();
 		}
 
-		return lOpened; // "*"; // stab
+		return lOpened;
 	}
-	std::tuple<int, std::string, std::string, bool> boldOpened(std::queue<std::tuple<int, std::string, std::string, bool>> mods) // std::string
+	std::tuple<int, std::string, std::string, bool> boldOpened(std::queue<std::tuple<int, std::string, std::string, bool>> mods)
 	{
 		std::tuple<int, std::string, std::string, bool> lOpened = { -1, "NO_ITEM", "UNKNOWN", false };
-		// std::queue<std::tuple<int, std::string, bool>> saveMods;
 		while (mods.empty() == false)
 		{
 			if (std::get<3>(mods.front()) == true && std::get<1>(mods.front()) == "**")
 			{
-				lOpened = mods.front(); // std::get<1>(mods.front());
+				lOpened = mods.front();
 			}
-			// saveMods.push(mods.pop());
 			mods.pop();
 		}
 
-		return lOpened; // "*"; // stab
+		return lOpened;
 	}
-	std::tuple<int, std::string, std::string, bool> italicOpened(std::queue<std::tuple<int, std::string, std::string, bool>> mods) // std::string
+	std::tuple<int, std::string, std::string, bool> italicOpened(std::queue<std::tuple<int, std::string, std::string, bool>> mods)
 	{
 		std::tuple<int, std::string, std::string, bool> lOpened = { -1, "NO_ITEM", "UNKNOWN", false };
-		// std::queue<std::tuple<int, std::string, bool>> saveMods;
 		while (mods.empty() == false)
 		{
 			if (std::get<3>(mods.front()) == true && std::get<1>(mods.front()) == "*")
 			{
-				lOpened = mods.front(); // std::get<1>(mods.front());
+				lOpened = mods.front();
 			}
-			// saveMods.push(mods.pop());
 			mods.pop();
 		}
 
-		return lOpened; // "*"; // stab
+		return lOpened;
 	}
 	// => getLastOpened() with pointers to the corresp. functions with bool
 
@@ -426,15 +409,14 @@ private:
 
 		while (mods.empty() == false)
 		{
-			// std::cout << mods.pop() << std::endl;
-			modsStack.push(mods.front()); // {0, "", false}
+			modsStack.push(mods.front());
 			mods.pop();
 		}
 
 		std::stack<std::tuple<int, std::string, std::string, bool>> reversedModsStack;
 		while (std::get<3>(modsStack.top()) == false)
 		{
-			reversedModsStack.push(modsStack.top()); // mods
+			reversedModsStack.push(modsStack.top());
 			modsStack.pop();
 		}
 
@@ -443,14 +425,12 @@ private:
 
 		while (modsStack.empty() == false)
 		{
-			reversedModsStack.push(modsStack.top()); // mods
+			reversedModsStack.push(modsStack.top());
 			modsStack.pop();
 		}
 
 		while (reversedModsStack.empty() == false)
 		{
-			// reversedModsStack.push(modsStack.top()); // mods
-			// modsStack.pop();
 			mods.push(reversedModsStack.top());
 			reversedModsStack.pop();
 		}
@@ -461,15 +441,14 @@ private:
 
 		while (mods.empty() == false)
 		{
-			// std::cout << mods.pop() << std::endl;
-			modsStack.push(mods.front()); // {0, "", false}
+			modsStack.push(mods.front());
 			mods.pop();
 		}
 
 		std::stack<std::tuple<int, std::string, std::string, bool>> reversedModsStack;
 		while (std::get<3>(modsStack.top()) == false && std::get<1>(modsStack.top()) != "**")
 		{
-			reversedModsStack.push(modsStack.top()); // mods
+			reversedModsStack.push(modsStack.top());
 			modsStack.pop();
 		}
 
@@ -478,14 +457,12 @@ private:
 
 		while (modsStack.empty() == false)
 		{
-			reversedModsStack.push(modsStack.top()); // mods
+			reversedModsStack.push(modsStack.top());
 			modsStack.pop();
 		}
 
 		while (reversedModsStack.empty() == false)
 		{
-			// reversedModsStack.push(modsStack.top()); // mods
-			// modsStack.pop();
 			mods.push(reversedModsStack.top());
 			reversedModsStack.pop();
 		}
@@ -496,15 +473,14 @@ private:
 
 		while (mods.empty() == false)
 		{
-			// std::cout << mods.pop() << std::endl;
-			modsStack.push(mods.front()); // {0, "", false}
+			modsStack.push(mods.front());
 			mods.pop();
 		}
 
 		std::stack<std::tuple<int, std::string, std::string, bool>> reversedModsStack;
 		while (std::get<3>(modsStack.top()) == false && std::get<1>(modsStack.top()) != "*")
 		{
-			reversedModsStack.push(modsStack.top()); // mods
+			reversedModsStack.push(modsStack.top());
 			modsStack.pop();
 		}
 
@@ -513,14 +489,12 @@ private:
 
 		while (modsStack.empty() == false)
 		{
-			reversedModsStack.push(modsStack.top()); // mods
+			reversedModsStack.push(modsStack.top());
 			modsStack.pop();
 		}
 
 		while (reversedModsStack.empty() == false)
 		{
-			// reversedModsStack.push(modsStack.top()); // mods
-			// modsStack.pop();
 			mods.push(reversedModsStack.top());
 			reversedModsStack.pop();
 		}
@@ -533,56 +507,43 @@ private:
 
 		while (mods.empty() == false)
 		{
-			// std::cout << mods.pop() << std::endl;
-			modsStack.push(mods.front()); // {0, "", false}
+			modsStack.push(mods.front());
 			mods.pop();
 		}
 
 		std::stack<std::tuple<int, std::string, std::string, bool>> reversedModsStack;
 		while (std::get<3>(modsStack.top()) == false)
 		{
-			reversedModsStack.push(modsStack.top()); // mods
+			reversedModsStack.push(modsStack.top());
 			modsStack.pop();
 		}
 
-		// reversedModsStack.push({ std::get<0>(modsStack.top()), std::get<1>(modsStack.top()), std::get<2>(modsStack.top()), false });
 		modsStack.pop();
 
 		while (modsStack.empty() == false)
 		{
-			reversedModsStack.push(modsStack.top()); // mods
+			reversedModsStack.push(modsStack.top());
 			modsStack.pop();
 		}
 
 		while (reversedModsStack.empty() == false)
 		{
-			// reversedModsStack.push(modsStack.top()); // mods
-			// modsStack.pop();
 			mods.push(reversedModsStack.top());
 			reversedModsStack.pop();
 		}
 	}
 	bool closed(std::queue<std::tuple<int, std::string, std::string, bool>>& mods)
 	{
-		// cond - ?
 		return std::get<1>(mods.front()) == std::get<1>(mods.back());
 	}
 
 	std::string evaluateLinks(std::string line)
 	{
-		// пока есть ](
-		// найти текущий ](
-		// найти к нему [ ближайший слева,
-		// найти к нему ) ближайший справа
-		// чего-то нет - стоп
-		// если есть, то замена
-
-		// int curr = 0;
-		int twoSignsPos = line.find("](", 0); // curr
+		int twoSignsPos = line.find("](", 0);
 		while (twoSignsPos != std::string::npos)
 		{
 			int leftSqParPos = line.substr(0, twoSignsPos).find_last_of("[");
-			if (leftSqParPos == std::string::npos) // > twoSignsPos)
+			if (leftSqParPos == std::string::npos)
 			{
 				break;
 			}
@@ -597,7 +558,7 @@ private:
 
 			line = line.substr(0, leftSqParPos) + linkInserted + line.substr(rightParPos + 1, line.length() - rightParPos);
 
-			twoSignsPos = line.find("](", 0); // curr
+			twoSignsPos = line.find("](", 0);
 		}
 		return line;
 	}
@@ -608,7 +569,7 @@ private:
 
 		if (mods.empty() == true)
 		{
-			return evaluateLinks(line); //  formedString;
+			return evaluateLinks(line);
 		}
 
 		formedString += line.substr(0, std::get<0>(mods.front()));
@@ -638,7 +599,6 @@ private:
 				}
 			}
 
-			// int from = std::get<0>(mods.front());
 			std::tuple<int, std::string, std::string, bool> from = mods.front();
 			mods.pop();
 
@@ -648,8 +608,6 @@ private:
 				{
 					if (std::get<0>(from) + 1 < line.length())
 					{
-						// std::cout << std::get<0>(mods.front()) << std::endl;
-						// std::cout << line.substr(std::get<0>(from) + 1, std::get<0>(mods.front()) - std::get<0>(from) - 1) << std::endl;
 						formedString += evaluateLinks(line.substr(std::get<0>(from) + 1, std::get<0>(mods.front()) - std::get<0>(from) - 1));
 					}
 				}
@@ -657,8 +615,6 @@ private:
 				{
 					if (std::get<0>(from) + 2 < line.length())
 					{
-						// std::cout << std::get<0>(mods.front()) << std::endl;
-						// std::cout << line.substr(std::get<0>(from) + 2, std::get<0>(mods.front()) - std::get<0>(from) - 2) << std::endl;
 						formedString += evaluateLinks(line.substr(std::get<0>(from) + 2, std::get<0>(mods.front()) - std::get<0>(from) - 2));
 					}
 				}
